@@ -1,271 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Enhanced Chat Bot</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exquisite Realtime Weather App</title>
+  <!-- Google Font for a modern look -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles */
-    body {
+    /* Global Reset & Base Styles */
+    * {
       margin: 0;
       padding: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: #f2f2f2;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+      transition: background 0.5s ease;
+      color: #fff;
+      padding: 20px;
     }
-    /* Chat Container */
-    .chat-container {
+    .weather-container {
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 15px;
+      padding: 25px;
+      max-width: 500px;
       width: 100%;
-      max-width: 600px;
-      height: 80vh;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    /* Header */
-    .chat-header {
-      background: #4a90e2;
-      padding: 20px;
       text-align: center;
-      color: #fff;
-      font-size: 1.5rem;
-      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-    /* Chat Body */
-    .chat-body {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #f9f9f9;
+    .weather-container h1 {
+      margin-bottom: 20px;
+      font-weight: 700;
     }
-    /* Chat Message Styles */
-    .chat-message {
+    .weather-container input[type="text"] {
+      padding: 12px;
+      width: 75%;
+      border: none;
+      border-radius: 8px;
       margin-bottom: 15px;
-      display: flex;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    .chat-message.bot {
-      justify-content: flex-start;
-    }
-    .chat-message.user {
-      justify-content: flex-end;
-    }
-    .message-content {
-      max-width: 70%;
-      padding: 10px 15px;
-      border-radius: 20px;
       font-size: 1rem;
-      line-height: 1.4;
     }
-    .chat-message.bot .message-content {
-      background: #e1e1e1;
-      color: #333;
-      border-bottom-left-radius: 0;
-    }
-    .chat-message.user .message-content {
-      background: #4a90e2;
-      color: #fff;
-      border-bottom-right-radius: 0;
-    }
-    /* Chat Input */
-    .chat-input {
-      display: flex;
-      border-top: 1px solid #ddd;
-      background: #fff;
-    }
-    .chat-input input {
-      flex: 1;
+    .weather-container button {
+      padding: 12px 20px;
       border: none;
-      padding: 15px;
-      font-size: 1rem;
-      outline: none;
-    }
-    .chat-input button {
-      background: #4a90e2;
-      border: none;
+      background: #5563DE;
       color: #fff;
-      padding: 15px 25px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 1rem;
-      transition: background 0.2s ease;
+      font-weight: 500;
+      transition: background 0.3s ease;
+      margin: 5px;
     }
-    .chat-input button:hover {
-      background: #3a78c2;
+    .weather-container button:hover {
+      background: #4451c7;
     }
-    /* Animation */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .details {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .details p {
+      margin: 8px 0;
+      font-size: 1.1em;
+    }
+    .forecast-container {
+      display: flex;
+      overflow-x: auto;
+      margin-top: 20px;
+      padding-bottom: 10px;
+    }
+    .forecast-card {
+      flex: 0 0 auto;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      margin-right: 10px;
+      text-align: center;
+      min-width: 80px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .forecast-card p {
+      margin: 5px 0;
+      font-size: 0.9em;
+    }
+    /* Spinner styles */
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error {
+      margin-top: 10px;
+      color: #ff6b6b;
+      font-size: 1.1em;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">Enhanced Chat Bot</div>
-    <div class="chat-body" id="chatBody">
-      <!-- Chat messages will appear here -->
+  <div class="weather-container">
+    <h1>Realtime Weather App</h1>
+    <input type="text" id="city-input" placeholder="Enter city name" />
+    <div>
+      <button id="search-btn">Search</button>
+      <button id="toggle-unit">Switch to °F</button>
     </div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Type your message here..." autocomplete="off" />
-      <button id="sendBtn">Send</button>
+    <div id="weather-details">
+      <!-- Main weather details and spinner will be shown here -->
     </div>
+    <div class="forecast-container" id="forecast-container">
+      <!-- Hourly forecast cards will be added here -->
+    </div>
+    <div class="error" id="error"></div>
   </div>
 
   <script>
+    // Global Variables
+    let currentUnit = "C"; // "C" for Celsius, "F" for Fahrenheit
+    let currentLocationInfo = null;
+    let currentWeatherData = null;
+    let hourlyData = null;
+    let dailyData = null;
+    let currentCity = "";
+    
     // DOM Elements
-    const chatBody = document.getElementById('chatBody');
-    const chatInput = document.getElementById('chatInput');
-    const sendBtn = document.getElementById('sendBtn');
+    const searchBtn = document.getElementById("search-btn");
+    const cityInput = document.getElementById("city-input");
+    const weatherDetails = document.getElementById("weather-details");
+    const forecastContainer = document.getElementById("forecast-container");
+    const errorDiv = document.getElementById("error");
+    const toggleUnitBtn = document.getElementById("toggle-unit");
 
-    // Predefined static responses for common keywords and phrases
-    const predefinedResponses = {
-      "hello": "Hi there! How can I help you today?",
-      "hi": "Hello! What can I do for you?",
-      "help": "Sure, I'm here to assist you. What do you need help with?",
-      "price": "Our pricing is very competitive. Could you specify which product you're interested in?",
-      "thanks": "You're welcome! Let me know if you have more questions.",
-      "bye": "Goodbye! Have a great day!",
-      "name": "I'm your friendly chat bot, at your service.",
-      "who are you": "I'm a chat bot designed to assist you with various queries and searches.",
-      "how are you": "I'm just a program, but I'm functioning as expected!",
-      "purpose": "My purpose is to help answer your questions and assist you with searches.",
-      "default": "I'm sorry, I didn't understand that. Could you please rephrase?"
-    };
-
-    // Simulated dynamic response generator
-    function generateDynamicResponse(keyword) {
-      const randomIndex = Math.floor(Math.random() * 1000000);
-      return `Dynamic response for "${keyword}" #${randomIndex}`;
+    // Helper function: Show a loading spinner
+    function showLoading() {
+      weatherDetails.innerHTML = `<div class="spinner"></div>`;
+      forecastContainer.innerHTML = "";
+      errorDiv.textContent = "";
     }
 
-    // Check for arithmetic operations in the user input
-    function checkForOperations(input) {
-      input = input.toLowerCase();
-      let match;
-      // Addition: "add 5 and 3" or "add 5 to 3"
-      if (match = input.match(/add\s+(\d+)\s+(and|to)\s+(\d+)/)) {
-        const num1 = parseFloat(match[1]);
-        const num2 = parseFloat(match[3]);
-        return `The result of adding ${num1} and ${num2} is ${num1 + num2}.`;
-      }
-      // Subtraction: "subtract 2 from 10"
-      if (match = input.match(/subtract\s+(\d+)\s+from\s+(\d+)/)) {
-        const num1 = parseFloat(match[1]);
-        const num2 = parseFloat(match[2]);
-        return `The result of subtracting ${num1} from ${num2} is ${num2 - num1}.`;
-      }
-      // Multiplication: "multiply 4 and 6" or "multiply 4 by 6"
-      if (match = input.match(/multiply\s+(\d+)\s+(and|by)\s+(\d+)/)) {
-        const num1 = parseFloat(match[1]);
-        const num2 = parseFloat(match[3]);
-        return `The result of multiplying ${num1} and ${num2} is ${num1 * num2}.`;
-      }
-      // Division: "divide 20 by 4"
-      if (match = input.match(/divide\s+(\d+)\s+by\s+(\d+)/)) {
-        const num1 = parseFloat(match[1]);
-        const num2 = parseFloat(match[2]);
-        if (num2 !== 0) {
-          return `The result of dividing ${num1} by ${num2} is ${num1 / num2}.`;
-        } else {
-          return `Division by zero is not allowed.`;
-        }
-      }
-      return null;
+    // Helper function: Convert temperature if needed
+    function convertTemp(tempC) {
+      return currentUnit === "C" ? `${Math.round(tempC)} °C` : `${Math.round((tempC * 9/5) + 32)} °F`;
     }
 
-    // Asynchronously perform a Wikipedia search/define operation
-    async function performWikipediaSearch(query) {
-      // Let the user know we're searching
-      addMessage(`Searching Wikipedia for "${query}"...`, 'bot');
-      try {
-        const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Page not found");
-        }
-        const data = await response.json();
-        // Use the extract from Wikipedia; if not available, use a default message.
-        const extract = data.extract || "No summary available for this topic.";
-        addMessage(extract, 'bot');
-      } catch (error) {
-        addMessage(`Sorry, I couldn't fetch the information for "${query}".`, 'bot');
-      }
-    }
-
-    // Main function to get a bot response based on user input
-    function getResponse(userInput) {
-      // First, check for arithmetic operations
-      const operationResult = checkForOperations(userInput);
-      if (operationResult) {
-        return operationResult;
-      }
-      
-      // Next, check for predefined static responses using keyword matching
-      for (let key in predefinedResponses) {
-        if (key !== "default" && userInput.toLowerCase().includes(key)) {
-          return predefinedResponses[key];
-        }
-      }
-      
-      // If no static response is found, generate a dynamic response using the first word as a keyword.
-      const words = userInput.split(" ");
-      const keyword = words[0] || "";
-      return generateDynamicResponse(keyword);
-    }
-
-    // Add a new message to the chat window
-    function addMessage(content, sender) {
-      const messageEl = document.createElement('div');
-      messageEl.classList.add('chat-message', sender);
-      
-      const contentEl = document.createElement('div');
-      contentEl.classList.add('message-content');
-      contentEl.textContent = content;
-      
-      messageEl.appendChild(contentEl);
-      chatBody.appendChild(messageEl);
-      // Auto-scroll to the bottom
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-
-    // Process user input and generate a response (or perform a search)
-    function processInput() {
-      const userText = chatInput.value.trim();
-      if (!userText) return;
-      addMessage(userText, 'user');
-
-      // Check if the input is a Wikipedia search or define command.
-      const lowerText = userText.toLowerCase();
-      if (lowerText.startsWith("search:") || lowerText.startsWith("define:")) {
-        const query = userText.substring(userText.indexOf(":") + 1).trim();
-        performWikipediaSearch(query);
+    // Map Open-Meteo weather codes to descriptions, backgrounds, and icons (using emoji)
+    function getWeatherInfo(code) {
+      if (code === 0) {
+        return { description: "Clear sky", background: "linear-gradient(135deg, #f6d365, #fda085)", icon: "☀️" };
+      } else if ([1, 2, 3].includes(code)) {
+        return { description: "Partly cloudy", background: "linear-gradient(135deg, #bdc3c7, #2c3e50)", icon: "⛅" };
+      } else if ([45, 48].includes(code)) {
+        return { description: "Fog", background: "linear-gradient(135deg, #757f9a, #d7dde8)", icon: "🌫️" };
+      } else if ([51, 53, 55, 56, 57].includes(code)) {
+        return { description: "Drizzle", background: "linear-gradient(135deg, #667db6, #0082c8)", icon: "🌦️" };
+      } else if ([61, 63, 65, 80, 81, 82].includes(code)) {
+        return { description: "Rain", background: "linear-gradient(135deg, #667db6, #0082c8)", icon: "🌧️" };
+      } else if ([66, 67].includes(code)) {
+        return { description: "Freezing Rain", background: "linear-gradient(135deg, #667db6, #0082c8)", icon: "🌧️" };
+      } else if ([71, 73, 75].includes(code)) {
+        return { description: "Snow fall", background: "linear-gradient(135deg, #e6dada, #274046)", icon: "❄️" };
+      } else if (code === 77) {
+        return { description: "Snow grains", background: "linear-gradient(135deg, #e6dada, #274046)", icon: "❄️" };
+      } else if ([85, 86].includes(code)) {
+        return { description: "Snow showers", background: "linear-gradient(135deg, #e6dada, #274046)", icon: "❄️" };
+      } else if (code === 95) {
+        return { description: "Thunderstorm", background: "linear-gradient(135deg, #141E30, #243B55)", icon: "⛈️" };
+      } else if ([96, 99].includes(code)) {
+        return { description: "Thunderstorm with hail", background: "linear-gradient(135deg, #141E30, #243B55)", icon: "⛈️" };
       } else {
-        const botResponse = getResponse(userText);
-        setTimeout(() => {
-          addMessage(botResponse, 'bot');
-        }, 500);
+        return { description: "Unknown", background: "linear-gradient(135deg, #74ABE2, #5563DE)", icon: "❓" };
       }
-      chatInput.value = '';
     }
 
-    // Event listeners for sending messages
-    sendBtn.addEventListener('click', processInput);
-    chatInput.addEventListener('keyup', event => {
-      if (event.key === 'Enter') {
-        processInput();
+    // Render the main weather information and forecast
+    function renderWeather() {
+      if (!currentWeatherData || !currentLocationInfo) return;
+
+      // Get weather info for current conditions
+      const weatherInfo = getWeatherInfo(currentWeatherData.weathercode);
+      // Update background based on current weather
+      document.body.style.background = weatherInfo.background;
+
+      // Get sunrise and sunset from daily data (if available)
+      let sunrise = "N/A", sunset = "N/A";
+      if (dailyData && dailyData.sunrise && dailyData.sunset) {
+        // Assume the first index corresponds to today
+        sunrise = new Date(dailyData.sunrise[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        sunset  = new Date(dailyData.sunset[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      }
+
+      // Render current weather details
+      weatherDetails.innerHTML = `
+        <h2>${currentLocationInfo.name}${currentLocationInfo.country_code ? ', ' + currentLocationInfo.country_code : ''}</h2>
+        <p style="font-size: 2.5em;">${weatherInfo.icon}</p>
+        <div class="details">
+          <p><strong>Temperature:</strong> ${convertTemp(currentWeatherData.temperature)}</p>
+          <p><strong>Condition:</strong> ${weatherInfo.description}</p>
+          <p><strong>Wind:</strong> ${currentWeatherData.windspeed} km/h at ${currentWeatherData.winddirection}°</p>
+          <p><strong>Sunrise:</strong> ${sunrise} | <strong>Sunset:</strong> ${sunset}</p>
+          <p><strong>Last updated:</strong> ${new Date(currentWeatherData.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+        </div>
+      `;
+
+      // Render hourly forecast (next 6 hours)
+      if (hourlyData && hourlyData.time && hourlyData.temperature_2m && hourlyData.weathercode) {
+        // Find index of the current weather time in the hourly array
+        const now = currentWeatherData.time;
+        const currentIndex = hourlyData.time.findIndex(t => t === now);
+        let forecastHTML = "";
+        // Loop for the next 6 hours (or until the end of the array)
+        for (let i = currentIndex; i < Math.min(currentIndex + 6, hourlyData.time.length); i++) {
+          const forecastTime = new Date(hourlyData.time[i]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          const temp = convertTemp(hourlyData.temperature_2m[i]);
+          const info = getWeatherInfo(hourlyData.weathercode[i]);
+          forecastHTML += `
+            <div class="forecast-card">
+              <p><strong>${forecastTime}</strong></p>
+              <p style="font-size: 1.8em;">${info.icon}</p>
+              <p>${temp}</p>
+            </div>
+          `;
+        }
+        forecastContainer.innerHTML = forecastHTML;
+      }
+    }
+
+    // Update weather data and store raw values for re-rendering (e.g., unit toggle)
+    function updateWeather(data, locationInfo) {
+      currentLocationInfo = locationInfo;
+      currentWeatherData = data.current_weather;
+      hourlyData = data.hourly;
+      dailyData = data.daily; // Contains sunrise and sunset
+      renderWeather();
+    }
+
+    // Fetch city coordinates via Open-Meteo's Geocoding API
+    function fetchCity(city) {
+      showLoading();
+      fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.results && data.results.length > 0) {
+            // Use the first matching result
+            const location = data.results[0];
+            currentCity = location.name;
+            fetchWeather(location.latitude, location.longitude, location);
+          } else {
+            throw new Error("City not found");
+          }
+        })
+        .catch(error => {
+          errorDiv.textContent = error.message;
+          weatherDetails.innerHTML = "";
+          forecastContainer.innerHTML = "";
+        });
+    }
+
+    // Fetch weather data using Open-Meteo's Weather API (current, hourly, and daily)
+    function fetchWeather(lat, lon, locationInfo) {
+      showLoading();
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+                  `&current_weather=true&hourly=temperature_2m,weathercode` +
+                  `&daily=sunrise,sunset&timezone=auto`;
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.current_weather) {
+            updateWeather(data, locationInfo);
+          } else {
+            throw new Error("Weather data not available");
+          }
+        })
+        .catch(error => {
+          errorDiv.textContent = error.message;
+          weatherDetails.innerHTML = "";
+          forecastContainer.innerHTML = "";
+        });
+    }
+
+    // Event Listeners
+    searchBtn.addEventListener("click", () => {
+      const city = cityInput.value.trim();
+      if (city) {
+        fetchCity(city);
       }
     });
+    cityInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter") {
+        const city = cityInput.value.trim();
+        if (city) {
+          fetchCity(city);
+        }
+      }
+    });
+    toggleUnitBtn.addEventListener("click", () => {
+      // Toggle between Celsius and Fahrenheit and update button text
+      currentUnit = currentUnit === "C" ? "F" : "C";
+      toggleUnitBtn.textContent = currentUnit === "C" ? "Switch to °F" : "Switch to °C";
+      renderWeather();
+    });
 
-    // Initial welcome message from the bot
-    window.onload = () => {
-      addMessage("Welcome to our enhanced chat service! You can chat with me or type commands like 'search: Albert Einstein' or 'define: Quantum Mechanics'. How can I assist you today?", "bot");
+    // Auto-refresh weather data every 10 minutes
+    function refreshWeather() {
+      if (currentCity) {
+        fetchCity(currentCity);
+      }
     }
+    setInterval(refreshWeather, 10 * 60 * 1000);
+
+    // Load a default city on page load
+    window.addEventListener("load", () => {
+      const defaultCity = "New York";
+      cityInput.value = defaultCity;
+      fetchCity(defaultCity);
+    });
   </script>
 </body>
 </html>
